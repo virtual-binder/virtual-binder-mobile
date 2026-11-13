@@ -94,7 +94,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.brandBadge}>
             <View style={styles.brandDot} />
-            <Text style={styles.brand}>POKÉMON CARD SCANNER</Text>
+            <Text style={styles.brand}>VIRTUAL BINDER</Text>
           </View>
           <Text style={styles.title}>Descubre qué cartas tienes.</Text>
           <Text style={styles.subtitle}>

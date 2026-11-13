@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Pokémon Card Scanner",
-    "slug": "pokemon-card-scanner",
+    "name": "Virtual Binder",
+    "slug": "virtual-binder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "pokemoncardscanner",
+    "scheme": "virtualbinder",
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rewin23.pokemoncardscanner"
+      "bundleIdentifier": "com.rewin23.virtualbinder"
     },
     "android": {
-      "package": "com.rewin23.pokemoncardscanner",
+      "package": "com.rewin23.virtualbinder",
       "adaptiveIcon": {
         "backgroundColor": "#0B1220",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -29,8 +29,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Permite seleccionar fotos para identificar tus cartas Pokémon.",
-          "cameraPermission": "Permite usar la cámara para fotografiar tus cartas Pokémon.",
+          "photosPermission": "Permite seleccionar fotos para identificar tus cartas coleccionables.",
+          "cameraPermission": "Permite usar la cámara para fotografiar tus cartas coleccionables.",
           "microphonePermission": false
         }
       ]
