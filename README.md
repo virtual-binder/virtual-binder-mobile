@@ -22,6 +22,8 @@ npm run web
 
 La cámara requiere un dispositivo físico o un emulador con cámara configurada. La galería funciona con Expo Go.
 
+Para iniciar Expo junto con Next.js, la API y PostgreSQL, ejecuta `make dev` desde el repositorio hermano `virtual-binder-infra`.
+
 ## Comprobaciones
 
 ```bash
