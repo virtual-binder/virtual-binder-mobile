@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import type { CameraCapturedPicture } from 'expo-camera';
+import { Link } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import {
   Alert,
   Image,
+  Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,6 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionButton } from '@/components/ActionButton';
+import { CaptureCamera } from '@/components/CaptureCamera';
 import { CardResult } from '@/components/CardResult';
 import { identifyCards } from '@/services/pokemonApi';
 import type { RecognitionResponse } from '@/types/card';
@@ -20,6 +25,7 @@ export default function HomeScreen() {
   const [result, setResult] = useState<RecognitionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cameraVisible, setCameraVisible] = useState(false);
 
   function applyPickedImage(pickerResult: ImagePicker.ImagePickerResult) {
     const selected = pickerResult.assets?.[0];
@@ -28,6 +34,22 @@ export default function HomeScreen() {
       setResult(null);
       setError(null);
     }
+  }
+
+  function applyCapturedImage(photo: CameraCapturedPicture) {
+    const extension = photo.format === 'png' ? 'png' : 'jpg';
+    applyPickedImage({
+      canceled: false,
+      assets: [{
+        uri: photo.uri,
+        width: photo.width,
+        height: photo.height,
+        fileName: `captura-${Date.now()}.${extension}`,
+        mimeType: photo.format === 'png' ? 'image/png' : 'image/jpeg',
+        type: 'image',
+      }],
+    });
+    setCameraVisible(false);
   }
 
   async function pickImage() {
@@ -43,6 +65,11 @@ export default function HomeScreen() {
   }
 
   async function takePhoto() {
+    if (Platform.OS !== 'web') {
+      setCameraVisible(true);
+      return;
+    }
+
     try {
       const permission = await ImagePicker.requestCameraPermissionsAsync();
       if (!permission.granted) {
@@ -92,15 +119,25 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={styles.brandBadge}>
-            <View style={styles.brandDot} />
-            <Text style={styles.brand}>VIRTUAL BINDER</Text>
+          <View style={styles.topRow}>
+            <View style={styles.brandBadge}>
+              <View style={styles.brandDot} />
+              <Text style={styles.brand}>VIRTUAL BINDER</Text>
+            </View>
+            <Link href="/profile" style={styles.profileLink}>Mi perfil</Link>
           </View>
           <Text style={styles.title}>Descubre qué cartas tienes.</Text>
           <Text style={styles.subtitle}>
-            Toma una foto con buena luz y fondo liso. Detectaremos las cartas y
+            Fotografía una carta o una página completa. Detectaremos las cartas y
             consultaremos sus precios.
           </Text>
+        </View>
+
+        <View style={styles.captureTips}>
+          <Text style={styles.tipsTitle}>Antes de fotografiar</Text>
+          <Text style={styles.tip}>· Usa luz indirecta y evita el flash directo.</Text>
+          <Text style={styles.tip}>· Mantén el teléfono paralelo a las cartas.</Text>
+          <Text style={styles.tip}>· Comprueba que el nombre y el número se vean nítidos.</Text>
         </View>
 
         <View style={styles.preview}>
@@ -121,9 +158,16 @@ export default function HomeScreen() {
           )}
         </View>
 
+        {image ? (
+          <Text style={styles.previewHint}>
+            Revisa la foto: si hay reflejos sobre el texto, vuelve a tomarla desde
+            un ángulo ligeramente distinto.
+          </Text>
+        ) : null}
+
         <View style={styles.actionsRow}>
           <ActionButton
-            label="Tomar foto"
+            label="Abrir cámara guiada"
             onPress={takePhoto}
             disabled={loading}
           />
@@ -181,6 +225,18 @@ export default function HomeScreen() {
           expansión y el número de coleccionista.
         </Text>
       </ScrollView>
+
+      <Modal
+        visible={cameraVisible}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setCameraVisible(false)}
+      >
+        <CaptureCamera
+          onCapture={applyCapturedImage}
+          onClose={() => setCameraVisible(false)}
+        />
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -199,6 +255,17 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingTop: 10,
     paddingBottom: 4,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  profileLink: {
+    color: '#D9E0EC',
+    fontSize: 13,
+    fontWeight: '700',
+    paddingVertical: 6,
   },
   brandBadge: {
     flexDirection: 'row',
@@ -231,6 +298,25 @@ const styles = StyleSheet.create({
     lineHeight: 23,
     maxWidth: 420,
   },
+  captureTips: {
+    gap: 7,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#27364F',
+    backgroundColor: '#111D31',
+    padding: 16,
+  },
+  tipsTitle: {
+    color: '#F5F7FB',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  tip: {
+    color: '#A9B5C9',
+    fontSize: 13,
+    lineHeight: 19,
+  },
   preview: {
     height: 250,
     backgroundColor: '#111D31',
@@ -242,6 +328,13 @@ const styles = StyleSheet.create({
   previewImage: {
     width: '100%',
     height: '100%',
+  },
+  previewHint: {
+    color: '#A9B5C9',
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+    paddingHorizontal: 8,
   },
   emptyPreview: {
     flex: 1,

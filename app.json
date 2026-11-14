@@ -27,6 +27,15 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite usar la cámara para fotografiar tus cartas coleccionables.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Permite seleccionar fotos para identificar tus cartas coleccionables.",
